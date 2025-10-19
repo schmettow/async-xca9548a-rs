@@ -180,10 +180,10 @@ mod private {
     use super::*;
 
     pub trait Sealed {}
-    impl<I2C> Sealed for Xca954xaData<I2C> {}
-    impl<I2C> Sealed for Xca9548a<I2C> {}
-    impl<I2C> Sealed for Xca9543a<I2C> {}
-    impl<I2C> Sealed for Xca9545a<I2C> {}
+    impl<'a, I2C> Sealed for Xca954xaData<'a, I2C> {}
+    impl<'a, I2C> Sealed for Xca9548a<'a, I2C> {}
+    impl<'a, I2C> Sealed for Xca9543a<'a, I2C> {}
+    impl<'a, I2C> Sealed for Xca9545a<'a, I2C> {}
     impl<'a, DEV, I2C> Sealed for Parts<'a, DEV, I2C> {}
     impl<'a, DEV, I2C> Sealed for Parts2<'a, DEV, I2C> {}
     impl<'a, DEV, I2C> Sealed for Parts4<'a, DEV, I2C> {}

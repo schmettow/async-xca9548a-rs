@@ -1,6 +1,6 @@
 use crate::{DoOnAcquired, Error, SelectChannels};
 use core::marker::PhantomData;
-use embedded_hal::i2c as ehal;
+use embedded_hal_async::i2c as ehal;
 
 /// Slave I2C device
 pub struct I2cSlave<'a, DEV: 'a, I2C>(&'a DEV, u8, PhantomData<I2C>);
@@ -39,7 +39,7 @@ parts!(
 
 impl<'a, DEV, I2C, E> ehal::ErrorType for I2cSlave<'a, DEV, I2C>
 where
-    DEV: DoOnAcquired<I2C>,
+    DEV: DoOnAcquired<'a, I2C>,
     I2C: ehal::I2c<Error = E>,
     E: ehal::Error,
 {
@@ -48,52 +48,66 @@ where
 
 impl<'a, DEV, I2C, E> ehal::I2c for I2cSlave<'a, DEV, I2C>
 where
-    DEV: DoOnAcquired<I2C>,
+    DEV: DoOnAcquired<'a, I2C>,
     I2C: ehal::I2c<Error = E>,
     E: ehal::Error,
 {
-    fn transaction(
+    async fn transaction(
         &mut self,
         address: u8,
         operations: &mut [ehal::Operation<'_>],
     ) -> Result<(), Self::Error> {
-        self.0.do_on_acquired(|mut dev| {
-            if dev.selected_channel_mask != self.1 {
-                dev.select_channels(self.1)?;
-            }
-            dev.i2c.transaction(address, operations).map_err(Error::I2C)
-        })
+        self.0
+            .do_on_acquired(async |mut dev| {
+                if dev.selected_channel_mask != self.1 {
+                    dev.select_channels(self.1).await?;
+                }
+                dev.i2c
+                    .transaction(address, operations)
+                    .await
+                    .map_err(Error::I2C)
+            })
+            .await
     }
 
-    fn read(&mut self, address: u8, read: &mut [u8]) -> Result<(), Self::Error> {
-        self.0.do_on_acquired(|mut dev| {
-            if dev.selected_channel_mask != self.1 {
-                dev.select_channels(self.1)?;
-            }
-            dev.i2c.read(address, read).map_err(Error::I2C)
-        })
+    async fn read(&mut self, address: u8, read: &mut [u8]) -> Result<(), Self::Error> {
+        self.0
+            .do_on_acquired(async |mut dev| {
+                if dev.selected_channel_mask != self.1 {
+                    dev.select_channels(self.1).await?;
+                }
+                dev.i2c.read(address, read).await.map_err(Error::I2C)
+            })
+            .await
     }
 
-    fn write(&mut self, address: u8, write: &[u8]) -> Result<(), Self::Error> {
-        self.0.do_on_acquired(|mut dev| {
-            if dev.selected_channel_mask != self.1 {
-                dev.select_channels(self.1)?;
-            }
-            dev.i2c.write(address, write).map_err(Error::I2C)
-        })
+    async fn write(&mut self, address: u8, write: &[u8]) -> Result<(), Self::Error> {
+        self.0
+            .do_on_acquired(async |mut dev| {
+                if dev.selected_channel_mask != self.1 {
+                    dev.select_channels(self.1).await?;
+                }
+                dev.i2c.write(address, write).await.map_err(Error::I2C)
+            })
+            .await
     }
 
-    fn write_read(
+    async fn write_read(
         &mut self,
         address: u8,
         write: &[u8],
         read: &mut [u8],
     ) -> Result<(), Self::Error> {
-        self.0.do_on_acquired(|mut dev| {
-            if dev.selected_channel_mask != self.1 {
-                dev.select_channels(self.1)?;
-            }
-            dev.i2c.write_read(address, write, read).map_err(Error::I2C)
-        })
+        self.0
+            .do_on_acquired(async |mut dev| {
+                if dev.selected_channel_mask != self.1 {
+                    dev.select_channels(self.1).await?;
+                }
+                dev.i2c
+                    .write_read(address, write, read)
+                    .await
+                    .map_err(Error::I2C)
+            })
+            .await
     }
 }

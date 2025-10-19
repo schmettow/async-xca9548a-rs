@@ -1,4 +1,4 @@
-use embedded_hal::i2c::Operation;
+use embedded_hal_async::i2c::Operation;
 use embedded_hal_mock::eh1::i2c::{Mock as I2cMock, Transaction as I2cTrans};
 use xca9548a::{SlaveAddr, Xca9543a, Xca9545a, Xca9548a};
 

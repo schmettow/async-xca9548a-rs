@@ -34,20 +34,20 @@ impl SlaveAddr {
 
 /// Device driver for T/PCA9548A
 #[derive(Debug)]
-pub struct Xca9548a<I2C> {
-    pub(crate) data: cell::RefCell<Xca954xaData<I2C>>,
+pub struct Xca9548a<'a, I2C> {
+    pub(crate) data: cell::RefCell<Xca954xaData<'a, I2C>>,
 }
 
 /// Device driver for T/PCA9543A
 #[derive(Debug)]
-pub struct Xca9543a<I2C> {
-    pub(crate) data: cell::RefCell<Xca954xaData<I2C>>,
+pub struct Xca9543a<'a, I2C> {
+    pub(crate) data: cell::RefCell<Xca954xaData<'a, I2C>>,
 }
 
 /// Device driver for T/PCA9545A
 #[derive(Debug)]
-pub struct Xca9545a<I2C> {
-    pub(crate) data: cell::RefCell<Xca954xaData<I2C>>,
+pub struct Xca9545a<'a, I2C> {
+    pub(crate) data: cell::RefCell<Xca954xaData<'a, I2C>>,
 }
 
 #[cfg(test)]
