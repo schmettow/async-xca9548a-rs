@@ -34,6 +34,7 @@ where
 
 #[doc(hidden)]
 pub trait DoOnAcquired<'a, I2C>: private::Sealed {
+    #[allow(async_fn_in_trait)]
     async fn do_on_acquired<R, E: ehal::Error>(
         &self,
         f: impl AsyncFnOnce(cell::RefMut<Xca954xaData<I2C>>) -> Result<R, Error<E>>,
@@ -43,6 +44,7 @@ pub trait DoOnAcquired<'a, I2C>: private::Sealed {
 #[doc(hidden)]
 pub trait SelectChannels: private::Sealed {
     type Error;
+    #[allow(async_fn_in_trait)]
     async fn select_channels(&mut self, mask: u8) -> Result<(), Self::Error>;
 }
 
@@ -158,7 +160,7 @@ macro_rules! impl_device {
             /// It is not possible to know the compatibilities between channels
             /// so when talking to a split I2C device, only its channel
             /// will be selected.
-            pub fn split(&self) -> $parts<$name<'a, I2C>, I2C> {
+            pub fn split(&self) -> $parts<'_, $name<'a, I2C>, I2C> {
                 $parts::new(&self)
             }
         }
